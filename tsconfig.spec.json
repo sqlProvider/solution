@@ -1,0 +1,13 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"importHelpers": false,
+		/* */
+		/* Types */
+		"types": [
+			"node",
+			"jasmine",
+			"@types/jasmine",
+		]
+	}
+}

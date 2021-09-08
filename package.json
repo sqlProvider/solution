@@ -1,0 +1,30 @@
+{
+	"name": "solution",
+	"version": "0.1.0",
+	"private": true,
+	"devDependencies": {
+		"@bazel/bazelisk": "1.10.1",
+		"@bazel/buildifier": "4.0.1",
+		"@bazel/ibazel": "0.15.10",
+		"@bazel/typescript": "4.0.0",
+		"typescript": "4.3.5",
+		"@bazel/jasmine": "^4.0.0",
+		"@types/jasmine": "^3.9.0",
+		"jasmine": "^3.9.0",
+		"jasmine-core": "^3.9.0",
+		"jest-cli": "^27.1.0"
+	},
+	"scripts": {
+		"serve": "yarn serve:test",
+		"serve:debug": "ibazel run //packages/test:test-bin --config=debug",
+		"serve:test": "ibazel run //packages/test:test-bin",
+		"serve:test:debug": "ibazel run //packages/test:test --config=debug",
+		"#### Test Commands ####": "###########################################",
+		"#### Workspace Commands ####": "###########################################",
+		"bazel": "bazel",
+		"clean": "bazel clean"
+	},
+	"dependencies": {
+		"tslib": "2.3.1"
+	}
+}

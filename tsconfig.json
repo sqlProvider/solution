@@ -1,0 +1,64 @@
+{
+	"compilerOptions": {
+		"target": "es2015",
+		"moduleResolution": "Node",
+		"module": "es2015",
+		"declaration": true,
+		"sourceMap": true,
+		"rootDir": ".",
+		"baseUrl": ".",
+		"esModuleInterop": true,
+		"importHelpers": true,
+		"disableSourceOfProjectReferenceRedirect": true,
+		/*  */
+		/* Paths */
+		"paths": {
+			"@solution/*": [
+				"./packages/*",
+				"./"
+			]
+		},
+		/*  */
+		/* Strict Type-Checking Options */
+		"strict": true,
+		"alwaysStrict": true,
+		/*  */
+		/* Additional Checks */
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitAny": false,
+		/*  */
+		/* Debugging Options */
+		"traceResolution": false,
+		"listEmittedFiles": false,
+		"listFiles": true,
+		"pretty": true,
+		"skipLibCheck": true,
+		/*  */
+		/* Experimental Options */
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"allowSyntheticDefaultImports": true,
+		/*  */
+		/* Types */
+		"lib": [
+			"ES2019",
+			"DOM"
+		],
+		"types": [
+			"node",
+			"jasmine"
+		],
+		"typeRoots": [
+			"node_modules/@types"
+		]
+	},
+	"compileOnSave": false,
+	"exclude": [
+		"bazel-*",
+		"dist",
+		"node_modules"
+	]
+}
