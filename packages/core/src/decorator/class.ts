@@ -1,5 +1,8 @@
+//#region Global Imports
+//#endregion Global Imports
+
 //#region Local Imports
-import { IDecoratorProcessorFn, IDecoratorRootAccessFn } from '@solution/core/src/decorator/processor';
+import { IDecoratorProcessorFn, IDecoratorRootAccessFn, IProcessorParams } from '@solution/core/src/decorator/processor';
 import { Type } from '@solution/core/src/type';
 //#endregion Local Imports
 
@@ -23,7 +26,6 @@ export interface IAnnotatedClass<T> {
  */
 export class ClassDecorator {
 	public static Create(
-		name: string,
 		processorFn?: IDecoratorProcessorFn,
 		rootAccessFn?: IDecoratorRootAccessFn
 	): IDecoratedClass {
@@ -31,21 +33,20 @@ export class ClassDecorator {
 		function DecoratorFactory(this: any, annotations: any): (targetClass: Function) => any {
 			// tslint:disable-next-line: only-arrow-functions
 			return function ClassDecoratorFactory(targetClass: Function): Function {
+				const params = { targetClass, annotations } as IProcessorParams;
+
 				if (Type.IsFunction(processorFn)) {
-					processorFn(targetClass, annotations);
+					processorFn(params);
 				}
 
 				if (Type.IsFunction(rootAccessFn)) {
-					const changedTarget = rootAccessFn(targetClass, annotations);
+					const changedTarget = rootAccessFn(params);
 					targetClass = changedTarget || targetClass;
 				}
 
 				return targetClass;
 			};
 		}
-
-		DecoratorFactory.prototype.metadataName = name;
-		(DecoratorFactory as any).annotationClassInstance = DecoratorFactory;
 
 		return DecoratorFactory as any;
 	}
