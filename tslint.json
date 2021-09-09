@@ -149,7 +149,7 @@
 			"LF"
 		],
 		"max-classes-per-file": [
-			true,
+			false,
 			1
 		],
 		"max-file-line-count": [
