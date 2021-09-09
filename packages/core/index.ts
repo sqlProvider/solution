@@ -1,1 +1,3 @@
-export * from "@solution/core/src/public-api";
+import 'reflect-metadata';
+
+export * from '@solution/core/src/public-api';

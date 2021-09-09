@@ -5,6 +5,7 @@
 		"module": "es2015",
 		"declaration": true,
 		"sourceMap": true,
+		"sourceRoot": ".",
 		"rootDir": ".",
 		"baseUrl": ".",
 		"esModuleInterop": true,

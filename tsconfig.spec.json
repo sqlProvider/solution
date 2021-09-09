@@ -6,6 +6,7 @@
 		/* Types */
 		"types": [
 			"node",
+			"reflect-metadata",
 			"jasmine",
 			"@types/jasmine",
 		]
