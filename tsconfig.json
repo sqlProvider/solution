@@ -49,7 +49,8 @@
 		],
 		"types": [
 			"node",
-			"jasmine"
+			"jasmine",
+			"reflect-metadata"
 		],
 		"typeRoots": [
 			"node_modules/@types"

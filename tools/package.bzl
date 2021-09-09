@@ -69,6 +69,3 @@ def sn_package(name, deps = [], srcs = None, test_srcs = None):
         name = module_spec_bin,
         srcs = [module_spec],
     )
-
-
-
