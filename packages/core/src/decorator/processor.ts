@@ -1,39 +1,59 @@
+//#region Global Imports
+//#endregion Global Imports
+
 //#region Local Imports
+import { WrongInstance } from '@solution/core/src/error';
 //#endregion Local Imports
+
+//#region Definations
+const ErrorString = 'DecoratorProcessor';
+//#endregion Definations
+
+/**
+ * @interface IProcessorParams
+ */
+export interface IProcessorParams<Annotations = any, Descriptor = any> {
+	annotations: Annotations;
+	descriptor: Descriptor;
+	key: string;
+	targetClass: Function;
+}
 
 /**
  * @type IDecoratorProcessorFn
  */
-export type IDecoratorProcessorFn = (type: Function, annotations: any) => any;
+export type IDecoratorProcessorFn = (params: IProcessorParams) => any;
 
 /**
  * @type IDecoratorRootAccessFn
  */
-export type IDecoratorRootAccessFn = (type: Function, annotations: any) => any;
+export type IDecoratorRootAccessFn = (params: IProcessorParams) => any;
 
 /**
  * @function DecoratorProcessor
  */
-export abstract class DecoratorProcessor<AnnotationType = any> {
+export abstract class DecoratorProcessor {
 	public static Combine(...processors: Array<DecoratorProcessor>): IDecoratorProcessorFn {
-		return (target: Function, annotations: any) => {
+		return (params: IProcessorParams) => {
 			processors.forEach(processor => {
-				if (processor && processor.do instanceof Function) {
-					processor.do(target, annotations);
+				if (processor instanceof DecoratorProcessor) {
+					return processor.do(params);
 				}
+
+				throw new WrongInstance(ErrorString, ErrorString);
 			});
 		};
 	}
 
 	public static RootAccess(processor: DecoratorProcessor): IDecoratorRootAccessFn {
-		return (target: Function, annotations: any) => {
-			if (processor && processor.do instanceof Function) {
-				return processor.do(target, annotations);
+		return (params: IProcessorParams) => {
+			if (processor instanceof DecoratorProcessor) {
+				return processor.do(params) || params.targetClass;
 			}
 
-			return target;
+			throw new WrongInstance(ErrorString, ErrorString);
 		};
 	}
 
-	public abstract do(target: Function, annotations?: AnnotationType): any;
+	public abstract do(params: IProcessorParams): any;
 }

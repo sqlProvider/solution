@@ -1,62 +1,120 @@
 //#region Global Imports
-import { DecoratorProcessor } from '@solution/core';
+import { DecoratorProcessor, IProcessorParams, Noop, Type } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
 //#endregion Local Imports
 
 //#region Definations
-class Noop {}
-class Boop {}
 //#endregion Definations
 
 describe('@solution/core/decorator/processor', () => {
-	const CombineTestProcessorOneKey = '__CombineTestProcessorOne';
-	const CombineTestProcessorOneValue = 'CombineTestProcessorOne';
-	const CombineTestProcessorTwoKey = '__CombineTestProcessorTwo';
-	const CombineTestProcessorTwoValue = 'CombineTestProcessorTwo';
+	const processorHubConfig = {
+		annotations: [],
+		descriptor: null,
+		key: '',
+		targetClass: Noop
+	};
 
-	class CombineTestProcessorOne extends DecoratorProcessor {
-		public do(target: Function): any {
-			target.prototype[CombineTestProcessorOneKey] = CombineTestProcessorOneValue;
+	it('Processor must be extend DecoratorProcessor', () => {
+		class ProcessorFn {
+			public do(): any {
+				// This method never been called
+				expect(true).toBeFalse();
+			}
 		}
-	}
 
-	class CombineTestProcessorTwo extends DecoratorProcessor {
-		public do(target: Function): any {
-			target.prototype[CombineTestProcessorTwoKey] = CombineTestProcessorTwoValue;
+		try {
+			const processorHub = DecoratorProcessor.Combine(
+				new ProcessorFn()
+			);
+
+			processorHub(processorHubConfig);
+		} catch (error) {
+			expect(error).toBeTruthy();
 		}
-	}
+	});
 
-	class RootAccessTestProcessor extends DecoratorProcessor {
-		public do(): any {
-			return Boop;
+	it('Usage of DecoratorProcessor.Combine', () => {
+		class ProcessorFn extends DecoratorProcessor {
+			public do({ targetClass }: IProcessorParams): any {
+				targetClass.prototype['ProcessorFn'] = 'ProcessorFnValue';
+			}
 		}
-	}
 
-	it('can processors modify TargetClass', () => {
 		const processorHub = DecoratorProcessor.Combine(
-			new CombineTestProcessorOne(),
-			new CombineTestProcessorTwo()
+			new ProcessorFn()
 		);
 
-		processorHub(Noop, []);
+		processorHub(processorHubConfig);
 
 		const noop = new Noop();
 
-		expect(noop[CombineTestProcessorOneKey]).toBe(CombineTestProcessorOneValue);
-		expect(noop[CombineTestProcessorTwoKey]).toBe(CombineTestProcessorTwoValue);
+		expect(noop['ProcessorFn']).toBe('ProcessorFnValue');
 	});
 
-	it('can root processor change TargetClass', () => {
+	it('Usage of DecoratorProcessor.RootAccess', () => {
+		class BlackHole {}
+		class Sun {}
+
+		class RootAccess extends DecoratorProcessor {
+			public do({ targetClass }: IProcessorParams): Function {
+				expect(targetClass).toEqual(Sun);
+
+				// Changing target class
+				return BlackHole;
+			}
+		}
+
 		const processorHub = DecoratorProcessor.RootAccess(
-			new RootAccessTestProcessor()
+			new RootAccess()
 		);
 
-		const changedClass = processorHub(Noop, []);
+		const processedTarget = processorHub({
+			...processorHubConfig,
+			targetClass: Sun
+		});
 
-		const noop = new changedClass();
+		const sun: any = new processedTarget();
 
-		expect(noop instanceof Boop).toBeTrue();
+		expect(sun instanceof BlackHole).toBeTrue();
+		expect(sun instanceof Sun).toBeFalse();
+	});
+
+	it('Usage of DecoratorProcessor.RootAccess with Wrapper', () => {
+		class Target {
+			public hello(): string {
+				return 'hello';
+			}
+		}
+
+		class RootAccess extends DecoratorProcessor {
+			public do({ targetClass }: IProcessorParams): Function {
+				expect(targetClass).toEqual(Target);
+
+				// Wrapping target class
+				return class extends (targetClass as  any) {
+					public world(): string {
+						return `world`;
+					}
+				};
+			}
+		}
+
+		const processorHub = DecoratorProcessor.RootAccess(
+			new RootAccess()
+		);
+
+		const processedTarget = processorHub({
+			...processorHubConfig,
+			targetClass: Target
+		});
+
+		const target: any = new processedTarget();
+
+		expect(target instanceof Target).toBeTrue();
+		expect(Type.IsFunction(target.hello)).toBeTrue();
+		expect(Type.IsFunction(target.world)).toBeTrue();
+		expect(`${target.hello()} ${target.world()}`).toBe('hello world');
 	});
 });
