@@ -9,6 +9,11 @@ export * from '@solution/core/src/decorator';
 export * from '@solution/core/src/util';
 
 /**
+ * @solution/core/error
+ */
+ export * from '@solution/core/src/error';
+
+/**
  * @solution/core/type
  */
 export * from '@solution/core/src/type';

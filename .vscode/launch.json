@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "Run Script: spec",
+            "request": "launch",
+            "command": "yarn run bazel run //packages/core:core_spec_bin",
+            "cwd": "${workspaceFolder}",
+            "outFiles": [
+                "${workspaceFolder}/**/*.ts",
+                "!**/node_modules/**"
+            ],
+			"sourceMaps": true,
+            "sourceMapPathOverrides": {
+                "./*": "${workspaceRoot}/*",
+                "./../*": "${workspaceRoot}/*",
+                "./../../*": "${workspaceRoot}/*",
+                "./../../../*": "${workspaceRoot}/*",
+                "./../../../../*": "${workspaceRoot}/*",
+                "./../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../../../../../../*": "${workspaceRoot}/*",
+                "./../../../../../../../../../../../../../../*": "${workspaceRoot}/*",
+            }
+        }
+}

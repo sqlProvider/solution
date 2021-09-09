@@ -3,7 +3,7 @@
  *
  * for type checking
  */
- export class Type {
+export class Type {
 	/**
 	 * Check undefined
 	 * @param value: any

@@ -1,7 +1,7 @@
 /**
- * @interface IObject<V>
+ * @interface IObject<Value>
  */
 
-export interface IObject<V = any> {
-	[key: string]: V;
+export interface IObject<Value = any> {
+	[key: string]: Value;
 }
