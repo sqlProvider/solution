@@ -1,4 +1,10 @@
 export {
+	DecoratorFactory,
+	IAnnotated,
+	IDecorated
+} from '@solution/core/src/decorator/factory';
+
+export {
 	ClassDecorator
 } from '@solution/core/src/decorator/class';
 
@@ -16,8 +22,3 @@ export {
 	IDecoratorRootAccessFn,
 	IProcessorParams
 } from '@solution/core/src/decorator/processor';
-
-export {
-	IAnnotated,
-	IDecorated
-} from '@solution/core/src/decorator/types';

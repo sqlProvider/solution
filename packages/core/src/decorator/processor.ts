@@ -15,7 +15,7 @@ const ErrorString = 'DecoratorProcessor';
 export interface IProcessorParams<Annotations = any, Descriptor = any> {
 	annotations: Annotations;
 	descriptor: Descriptor;
-	key: string;
+	key: string | any;
 	targetClass: Function;
 }
 

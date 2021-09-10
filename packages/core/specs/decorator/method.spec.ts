@@ -1,75 +1,23 @@
 //#region Global Imports
-import { noop, DecoratorProcessor, IAnnotated, IProcessorParams, MethodDecorator } from '@solution/core';
+import { DecoratorProcessor, IAnnotated, IProcessorParams, MethodDecorator } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
 //#endregion Local Imports
 
-describe('@solution/core/decorator/parameter', () => {
-	it('empty decorator should be creatable', () => {
-		const Decorator = MethodDecorator.Create();
-
-		@Decorator()
-		class DecoratedClass {
-			constructor(protected param: MethodDecorator) { }
-		}
-
-		const types = Reflect.getMetadata('design:paramtypes', DecoratedClass);
-
-		expect(types[0]).toEqual(MethodDecorator);
-	});
-
-	it('MethodDecorator.Create: invalid params check', () => {
-		let Decorator: any;
-		try {
-			// Those params must be a function for run
-			Decorator = (MethodDecorator as any).Create({}, []);
-
-			@Decorator()
-			class DecoratedClass { }
-
-			noop(DecoratedClass);
-		} catch (error) {
-			expect(error).toBeFalsy();
-		}
-
-		try {
-			// For combine processor this usage is valid because method get rest parameter
-			Decorator = MethodDecorator.Create(
-				(DecoratorProcessor as any).Combine()
-			);
-
-			@Decorator()
-			class DecoratedClass { }
-
-			noop(DecoratedClass);
-		} catch (error) {
-			expect(error).toBeFalsy();
-		}
-
-		try {
-			// Processor must be filled when using
-			Decorator = MethodDecorator.Create(
-				(DecoratorProcessor as any).Combine([{}]),
-				(DecoratorProcessor as any).RootAccess()
-			);
-
-			@Decorator()
-			class DecoratedClass { }
-
-			noop(DecoratedClass);
-		} catch (error) {
-			expect(error).toBeTruthy();
-		}
-	});
-
-	it('MethodDecorator.Create: usage of ProcessorFn', () => {
+describe('@solution/core/decorator/factory MethodDecorator Usages', () => {
+	it('Usage of ProcessorFn', () => {
 		interface IAnnotations {
 			extra: string;
 		}
 
 		class ProcessorFn extends DecoratorProcessor {
 			public do({ targetClass, annotations, key, descriptor }: IProcessorParams<IAnnotations, PropertyDescriptor>): any {
+				// Descriptor values
+				descriptor.configurable = true;
+				descriptor.enumerable = true;
+				descriptor.writable = true;
+
 				// Wrapping target method
 				targetClass[key] = (...args: Array<any>) =>
 					`${descriptor.value(...args, annotations.extra)} ${annotations.extra}`;
@@ -87,7 +35,6 @@ describe('@solution/core/decorator/parameter', () => {
 		);
 
 		class Target {
-
 			@Decorator({
 				extra: 'world'
 			})

@@ -1,5 +1,5 @@
 //#region Global Imports
-import { noop, ClassDecorator, DecoratorProcessor, IAnnotated, IProcessorParams, Noop, Type } from '@solution/core';
+import { noop, DecoratorFactory, DecoratorProcessor, IAnnotated, IProcessorParams, Noop, Type } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
@@ -9,72 +9,15 @@ import { noop, ClassDecorator, DecoratorProcessor, IAnnotated, IProcessorParams,
 
 //#endregion Definations
 
-describe('@solution/core/decorator/class', () => {
-	it('empty decorator should be creatable', () => {
-		const Decorator = ClassDecorator.Create();
-
-		@Decorator()
-		class DecoratedClass {
-			constructor(protected param: ClassDecorator) { }
-		}
-
-		const types = Reflect.getMetadata('design:paramtypes', DecoratedClass);
-
-		expect(types[0]).toEqual(ClassDecorator);
-	});
-
-	it('ClassDecorator.Create: invalid params check', () => {
-		let Decorator: any;
-		try {
-			// Those params must be a function for run
-			Decorator = (ClassDecorator as any).Create({}, []);
-
-			@Decorator()
-			class DecoratedClass { }
-
-			noop(DecoratedClass);
-		} catch (error) {
-			expect(error).toBeFalsy();
-		}
-
-		try {
-			// For combine processor this usage is valid because method get rest parameter
-			Decorator = ClassDecorator.Create(
-				(DecoratorProcessor as any).Combine()
-			);
-
-			@Decorator()
-			class DecoratedClass { }
-
-			noop(DecoratedClass);
-		} catch (error) {
-			expect(error).toBeFalsy();
-		}
-
-		try {
-			// Processor must be filled when using
-			Decorator = ClassDecorator.Create(
-				(DecoratorProcessor as any).Combine([{}]),
-				(DecoratorProcessor as any).RootAccess()
-			);
-
-			@Decorator()
-			class DecoratedClass { }
-
-			noop(DecoratedClass);
-		} catch (error) {
-			expect(error).toBeTruthy();
-		}
-	});
-
-	it('ClassDecorator.Create: usage of ProcessorFn', () => {
+describe('@solution/core/decorator/factory ClassDecorator Usages', () => {
+	it('DecoratorFactory: Usage of ProcessorFn', () => {
 		class ProcessorFn extends DecoratorProcessor {
 			public do({ targetClass }: IProcessorParams): any {
 				expect(targetClass).toEqual(DecoratedClass);
 			}
 		}
 
-		const Decorator = ClassDecorator.Create(
+		const Decorator = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
@@ -84,7 +27,7 @@ describe('@solution/core/decorator/class', () => {
 		class DecoratedClass { }
 	});
 
-	it('ClassDecorator.Create: usage of ProcessorFn with Annotations', () => {
+	it('DecoratorFactory: Usage of ProcessorFn with Annotations', () => {
 		interface IDecoratorAnnotations {
 			foo: string;
 			bar: number;
@@ -103,7 +46,7 @@ describe('@solution/core/decorator/class', () => {
 			}
 		}
 
-		const Decorator: IAnnotated<IDecoratorAnnotations> = ClassDecorator.Create(
+		const Decorator: IAnnotated<IDecoratorAnnotations> = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
@@ -113,7 +56,7 @@ describe('@solution/core/decorator/class', () => {
 		class DecoratedClass { }
 	});
 
-	it('ClassDecorator.Create: can ProcessorFn modify Target', () => {
+	it('DecoratorFactory: Can ProcessorFn modify Target', () => {
 		interface IDecoratorAnnotations {
 			key: string;
 			value: number;
@@ -130,7 +73,7 @@ describe('@solution/core/decorator/class', () => {
 			}
 		}
 
-		const Decorator: IAnnotated<IDecoratorAnnotations> = ClassDecorator.Create(
+		const Decorator: IAnnotated<IDecoratorAnnotations> = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
@@ -144,7 +87,7 @@ describe('@solution/core/decorator/class', () => {
 		expect(decoratedClass[decoratorAnnotations.key]).toBe(decoratorAnnotations.value);
 	});
 
-	it('ClassDecorator.Create: usage of RootAccess', () => {
+	it('DecoratorFactory: Usage of RootAccess', () => {
 		class RootAccess extends DecoratorProcessor {
 			public do({ targetClass }: IProcessorParams): Function {
 				expect(targetClass).toEqual(DecoratedClass);
@@ -154,7 +97,7 @@ describe('@solution/core/decorator/class', () => {
 			}
 		}
 
-		const Decorator = ClassDecorator.Create(
+		const Decorator = DecoratorFactory(
 			undefined,
 			DecoratorProcessor.RootAccess(
 				new RootAccess()
@@ -180,12 +123,12 @@ describe('@solution/core/decorator/class', () => {
 		expect(Type.IsFunction(decoratedClass.hello)).toBeFalse();
 	});
 
-	it('ClassDecorator.Create: usage of RootAccess with Wrapper', () => {
+	it('DecoratorFactory: Usage of RootAccess with Extend', () => {
 		class RootAccess extends DecoratorProcessor {
 			public do({ targetClass }: IProcessorParams): Function {
 				expect(targetClass).toEqual(DecoratedClass);
 
-				// Wrapping target class
+				// Extending target class
 				return class extends (targetClass as any) {
 					public world(): string {
 						return `world`;
@@ -194,7 +137,7 @@ describe('@solution/core/decorator/class', () => {
 			}
 		}
 
-		const Decorator = ClassDecorator.Create(
+		const Decorator = DecoratorFactory(
 			undefined,
 			DecoratorProcessor.RootAccess(
 				new RootAccess()
@@ -214,5 +157,51 @@ describe('@solution/core/decorator/class', () => {
 		expect(Type.IsFunction(decoratedClass.hello)).toBeTrue();
 		expect(Type.IsFunction(decoratedClass.world)).toBeTrue();
 		expect(`${decoratedClass.hello()} ${decoratedClass.world()}`).toBe('hello world');
+	});
+
+	it('DecoratorFactory: Usage of RootAccess with Wrapper', () => {
+		interface IDecoratorAnnotations {
+			extra: string;
+		}
+		class RootAccess extends DecoratorProcessor {
+			public do({ targetClass, annotations: { extra } }: IProcessorParams<IDecoratorAnnotations>): Function {
+				expect(targetClass).toEqual(DecoratedClass);
+				// Wrapping target class
+				// tslint:disable-next-line: only-arrow-functions
+				function ClassWrapper(...args: Array<any>): typeof targetClass {
+					return new (targetClass as any)(...args, extra);
+				}
+
+				ClassWrapper.prototype = targetClass.prototype;
+
+				return ClassWrapper;
+			}
+		}
+
+		const Decorator: IAnnotated<IDecoratorAnnotations> = DecoratorFactory(
+			undefined,
+			DecoratorProcessor.RootAccess(
+				new RootAccess()
+			)
+		);
+
+		@Decorator({
+			extra: 'hello world'
+		})
+		class DecoratedClass {
+			constructor(extra?: string) {
+				expect(extra).toBe('hello world');
+			}
+
+			public hello(): string {
+				return 'hello';
+			}
+		}
+
+		const decoratedClass: any = new DecoratedClass();
+
+		expect(decoratedClass instanceof DecoratedClass).toBeTrue();
+		expect(Type.IsFunction(decoratedClass.hello)).toBeTrue();
+		expect(decoratedClass.hello()).toBe('hello');
 	});
 });
