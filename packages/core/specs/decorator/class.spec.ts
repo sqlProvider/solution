@@ -1,5 +1,5 @@
 //#region Global Imports
-import { noop, DecoratorFactory, DecoratorProcessor, IAnnotated, IProcessorParams, Noop, Type } from '@solution/core';
+import { DecoratorFactory, DecoratorProcessor, IAnnotated, IProcessorParams, Noop, Type } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports

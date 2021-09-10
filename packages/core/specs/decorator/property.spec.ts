@@ -5,22 +5,23 @@ import { DecoratorFactory, DecoratorProcessor, IAnnotated, IProcessorParams } fr
 //#region Local Imports
 //#endregion Local Imports
 
-describe('@solution/core/decorator/factory MethodDecorator Usages', () => {
+describe('@solution/core/decorator/factory PropertyDecorator Usages', () => {
 	it('Usage of ProcessorFn', () => {
 		interface IAnnotations {
 			extra: string;
 		}
 
 		class ProcessorFn extends DecoratorProcessor {
-			public do({ targetClass, annotations, key, descriptor }: IProcessorParams<IAnnotations, PropertyDescriptor>): any {
-				// Descriptor values
-				descriptor.configurable = true;
-				descriptor.enumerable = true;
-				descriptor.writable = true;
+			public do({ targetClass, annotations: { extra }, key }: IProcessorParams<IAnnotations>): any {
+				delete targetClass[key];
+				let realValue: any;
 
-				// Wrapping target method
-				targetClass[key] = (...args: Array<any>) =>
-					`${descriptor.value(...args, annotations.extra)} ${annotations.extra}`;
+				Object.defineProperty(targetClass, key, {
+					get(): any {
+						return `${realValue} ${extra}`;
+					},
+					set(value: any): void { realValue = value; }
+				});
 			}
 		}
 
@@ -38,13 +39,11 @@ describe('@solution/core/decorator/factory MethodDecorator Usages', () => {
 			@Decorator({
 				extra: 'world'
 			})
-			public hello(): string {
-				return 'hello';
-			}
+			public hello: string = 'hello';
 		}
 
 		const target = new Target();
 
-		expect(target.hello()).toBe('hello world');
+		expect(target.hello).toBe('hello world');
 	});
 });

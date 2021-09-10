@@ -1,5 +1,5 @@
 //#region Global Imports
-import { DecoratorProcessor, IAnnotated, IProcessorParams, MethodDecorator } from '@solution/core';
+import { DecoratorFactory, DecoratorProcessor, IAnnotated, IProcessorParams } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
@@ -7,6 +7,7 @@ import { DecoratorProcessor, IAnnotated, IProcessorParams, MethodDecorator } fro
 
 describe('@solution/core/decorator/factory AccessorDecorator Usages', () => {
 	it('Usage of ProcessorFn', () => {
+
 		interface IAnnotations {
 			extra: string;
 		}
@@ -24,7 +25,7 @@ describe('@solution/core/decorator/factory AccessorDecorator Usages', () => {
 			}
 		}
 
-		const Decorator: IAnnotated<IAnnotations> = MethodDecorator.Create(
+		const Decorator: IAnnotated<IAnnotations> = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
