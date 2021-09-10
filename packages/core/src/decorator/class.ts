@@ -3,23 +3,9 @@
 
 //#region Local Imports
 import { IDecoratorProcessorFn, IDecoratorRootAccessFn, IProcessorParams } from '@solution/core/src/decorator/processor';
+import { IDecorated } from '@solution/core/src/decorator/types';
 import { Type } from '@solution/core/src/type';
 //#endregion Local Imports
-
-/**
- * @interface IDecoratedClass
- */
-export interface IDecoratedClass {
-	new(...args: Array<any>): any; (...args: Array<any>): any; (...args: Array<any>): (classInstance: any) => any;
-}
-
-/**
- * @interface IAnnotatedClass<T>
- */
-export interface IAnnotatedClass<T> {
-	(obj: T): any;
-	new(obj: T): T;
-}
 
 /**
  * @class ClassDecorator
@@ -28,7 +14,7 @@ export class ClassDecorator {
 	public static Create(
 		processorFn?: IDecoratorProcessorFn,
 		rootAccessFn?: IDecoratorRootAccessFn
-	): IDecoratedClass {
+	): IDecorated {
 
 		function DecoratorFactory(this: any, annotations: any): (targetClass: Function) => any {
 			// tslint:disable-next-line: only-arrow-functions
