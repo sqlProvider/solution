@@ -1,5 +1,5 @@
 //#region Global Imports
-import { noop, DecoratorProcessor, IAnnotated, IProcessorParams, MethodDecorator } from '@solution/core';
+import { noop, AccessorDecorator, DecoratorProcessor, IAnnotated, IProcessorParams } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
@@ -7,23 +7,23 @@ import { noop, DecoratorProcessor, IAnnotated, IProcessorParams, MethodDecorator
 
 describe('@solution/core/decorator/parameter', () => {
 	it('empty decorator should be creatable', () => {
-		const Decorator = MethodDecorator.Create();
+		const Decorator = AccessorDecorator.Create();
 
 		@Decorator()
 		class DecoratedClass {
-			constructor(protected param: MethodDecorator) { }
+			constructor(protected param: AccessorDecorator) { }
 		}
 
 		const types = Reflect.getMetadata('design:paramtypes', DecoratedClass);
 
-		expect(types[0]).toEqual(MethodDecorator);
+		expect(types[0]).toEqual(AccessorDecorator);
 	});
 
-	it('MethodDecorator.Create: invalid params check', () => {
+	it('AccessorDecorator.Create: invalid params check', () => {
 		let Decorator: any;
 		try {
 			// Those params must be a function for run
-			Decorator = (MethodDecorator as any).Create({}, []);
+			Decorator = (AccessorDecorator as any).Create({}, []);
 
 			@Decorator()
 			class DecoratedClass { }
@@ -35,7 +35,7 @@ describe('@solution/core/decorator/parameter', () => {
 
 		try {
 			// For combine processor this usage is valid because method get rest parameter
-			Decorator = MethodDecorator.Create(
+			Decorator = AccessorDecorator.Create(
 				(DecoratorProcessor as any).Combine()
 			);
 
@@ -49,7 +49,7 @@ describe('@solution/core/decorator/parameter', () => {
 
 		try {
 			// Processor must be filled when using
-			Decorator = MethodDecorator.Create(
+			Decorator = AccessorDecorator.Create(
 				(DecoratorProcessor as any).Combine([{}]),
 				(DecoratorProcessor as any).RootAccess()
 			);
@@ -63,7 +63,7 @@ describe('@solution/core/decorator/parameter', () => {
 		}
 	});
 
-	it('MethodDecorator.Create: usage of ProcessorFn', () => {
+	it('AccessorDecorator.Create: usage of ProcessorFn', () => {
 		interface IAnnotations {
 			extra: string;
 		}
@@ -76,7 +76,7 @@ describe('@solution/core/decorator/parameter', () => {
 			}
 		}
 
-		const Decorator: IAnnotated<IAnnotations> = MethodDecorator.Create(
+		const Decorator: IAnnotated<IAnnotations> = AccessorDecorator.Create(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)

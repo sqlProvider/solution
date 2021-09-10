@@ -1,7 +1,5 @@
 export {
-	ClassDecorator,
-	IDecoratedClass,
-	IAnnotatedClass
+	ClassDecorator
 } from '@solution/core/src/decorator/class';
 
 export {
@@ -9,8 +7,17 @@ export {
 } from '@solution/core/src/decorator/method';
 
 export {
+	AccessorDecorator
+} from '@solution/core/src/decorator/accesor';
+
+export {
 	DecoratorProcessor,
 	IDecoratorProcessorFn,
 	IDecoratorRootAccessFn,
 	IProcessorParams
 } from '@solution/core/src/decorator/processor';
+
+export {
+	IAnnotated,
+	IDecorated
+} from '@solution/core/src/decorator/types';

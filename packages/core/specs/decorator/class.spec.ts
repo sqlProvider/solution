@@ -1,5 +1,5 @@
 //#region Global Imports
-import { noop, ClassDecorator, DecoratorProcessor, IAnnotatedClass, IProcessorParams, Noop, Type } from '@solution/core';
+import { noop, ClassDecorator, DecoratorProcessor, IAnnotated, IProcessorParams, Noop, Type } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
@@ -103,7 +103,7 @@ describe('@solution/core/decorator/class', () => {
 			}
 		}
 
-		const Decorator: IAnnotatedClass<IDecoratorAnnotations> = ClassDecorator.Create(
+		const Decorator: IAnnotated<IDecoratorAnnotations> = ClassDecorator.Create(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
@@ -130,7 +130,7 @@ describe('@solution/core/decorator/class', () => {
 			}
 		}
 
-		const Decorator: IAnnotatedClass<IDecoratorAnnotations> = ClassDecorator.Create(
+		const Decorator: IAnnotated<IDecoratorAnnotations> = ClassDecorator.Create(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
