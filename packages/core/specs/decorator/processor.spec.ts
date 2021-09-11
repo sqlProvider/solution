@@ -10,7 +10,7 @@ import { DecoratorProcessor, IProcessorParams, Noop, Type } from '@solution/core
 
 describe('@solution/core/decorator/processor', () => {
 	const processorHubConfig = {
-		annotations: [],
+		annotation: [],
 		descriptor: null,
 		key: '',
 		targetClass: Noop

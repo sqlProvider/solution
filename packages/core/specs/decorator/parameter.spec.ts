@@ -10,10 +10,10 @@ describe('@solution/core/decorator/factory ParameterDecorator Usages', () => {
 		const DefaultMetadataKey = Symbol('__DefaultMetadataKey');
 
 		class DefaultProcessorFn extends DecoratorProcessor {
-			public do({ targetClass, annotations, key, descriptor }: IProcessorParams<string>): any {
+			public do({ targetClass, annotation, key, descriptor }: IProcessorParams<string>): any {
 				const defaults: IObject<string> = Reflect.getOwnMetadata(DefaultMetadataKey, targetClass, key) || {};
 
-				defaults[descriptor] = annotations;
+				defaults[descriptor] = annotation;
 
 				Reflect.defineMetadata(DefaultMetadataKey, defaults, targetClass, key);
 			}

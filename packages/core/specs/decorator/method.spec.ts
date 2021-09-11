@@ -7,12 +7,12 @@ import { DecoratorFactory, DecoratorProcessor, IAnnotated, IProcessorParams } fr
 
 describe('@solution/core/decorator/factory MethodDecorator Usages', () => {
 	it('Usage of ProcessorFn', () => {
-		interface IAnnotations {
+		interface IAnnotation {
 			extra: string;
 		}
 
 		class ProcessorFn extends DecoratorProcessor {
-			public do({ targetClass, annotations, key, descriptor }: IProcessorParams<IAnnotations, PropertyDescriptor>): any {
+			public do({ targetClass, annotation, key, descriptor }: IProcessorParams<IAnnotation, PropertyDescriptor>): any {
 				// Descriptor values
 				descriptor.configurable = true;
 				descriptor.enumerable = true;
@@ -20,11 +20,11 @@ describe('@solution/core/decorator/factory MethodDecorator Usages', () => {
 
 				// Wrapping target method
 				targetClass[key] = (...args: Array<any>) =>
-					`${descriptor.value(...args, annotations.extra)} ${annotations.extra}`;
+					`${descriptor.value(...args, annotation.extra)} ${annotation.extra}`;
 			}
 		}
 
-		const Decorator: IAnnotated<IAnnotations> = DecoratorFactory(
+		const Decorator: IAnnotated<IAnnotation> = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)

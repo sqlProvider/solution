@@ -18,8 +18,8 @@ export interface IDecorated {
  * @interface IAnnotated<T>
  */
 export interface IAnnotated<T> {
-	(obj: T): any;
-	new(obj: T): T;
+	(annotation?: T): any;
+	new(annotation?: T): any;
 }
 
 /**
@@ -28,10 +28,10 @@ export interface IAnnotated<T> {
 // tslint:disable-next-line: only-arrow-functions
 export function DecoratorFactory(processorFn?: IDecoratorProcessorFn, rootAccessFn?: IDecoratorRootAccessFn): IDecorated {
 	// tslint:disable-next-line: only-arrow-functions
-	function DecoratorFactoryCore(annotations: any): (...args: Array<any>) => any {
+	function DecoratorFactoryCore(annotation: any): (...args: Array<any>) => any {
 		// tslint:disable-next-line: only-arrow-functions
 		return function Core(targetClass: Function, key?: string, descriptor?: any): any {
-			const params: IProcessorParams = { targetClass, annotations, key, descriptor };
+			const params: IProcessorParams = { targetClass, annotation, key, descriptor };
 
 			if (Type.IsFunction(processorFn)) {
 				processorFn(params);

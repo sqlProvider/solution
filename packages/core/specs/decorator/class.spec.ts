@@ -27,64 +27,64 @@ describe('@solution/core/decorator/factory ClassDecorator Usages', () => {
 		class DecoratedClass { }
 	});
 
-	it('DecoratorFactory: Usage of ProcessorFn with Annotations', () => {
-		interface IDecoratorAnnotations {
+	it('DecoratorFactory: Usage of ProcessorFn with Annotation', () => {
+		interface IDecoratorAnnotation {
 			foo: string;
 			bar: number;
 		}
 
-		const decoratorAnnotations: IDecoratorAnnotations = {
+		const decoratorAnnotation: IDecoratorAnnotation = {
 			bar: 1,
 			foo: 'bar'
 		};
 
 		class ProcessorFn extends DecoratorProcessor {
-			public do({ targetClass, annotations: { bar, foo } }: IProcessorParams<IDecoratorAnnotations>): any {
+			public do({ targetClass, annotation: { bar, foo } }: IProcessorParams<IDecoratorAnnotation>): any {
 				expect(targetClass).toEqual(DecoratedClass);
-				expect(bar).toBe(decoratorAnnotations.bar);
-				expect(foo).toBe(decoratorAnnotations.foo);
+				expect(bar).toBe(decoratorAnnotation.bar);
+				expect(foo).toBe(decoratorAnnotation.foo);
 			}
 		}
 
-		const Decorator: IAnnotated<IDecoratorAnnotations> = DecoratorFactory(
+		const Decorator: IAnnotated<IDecoratorAnnotation> = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
 		);
 
-		@Decorator(decoratorAnnotations)
+		@Decorator(decoratorAnnotation)
 		class DecoratedClass { }
 	});
 
 	it('DecoratorFactory: Can ProcessorFn modify Target', () => {
-		interface IDecoratorAnnotations {
+		interface IDecoratorAnnotation {
 			key: string;
 			value: number;
 		}
 
-		const decoratorAnnotations: IDecoratorAnnotations = {
-			key: 'ProcessorFnWithAnnotations',
+		const decoratorAnnotation: IDecoratorAnnotation = {
+			key: 'ProcessorFnWithAnnotation',
 			value: 1000
 		};
 
 		class ProcessorFn extends DecoratorProcessor {
-			public do({ targetClass, annotations }: IProcessorParams<IDecoratorAnnotations>): any {
-				targetClass.prototype[annotations.key] = annotations.value;
+			public do({ targetClass, annotation }: IProcessorParams<IDecoratorAnnotation>): any {
+				targetClass.prototype[annotation.key] = annotation.value;
 			}
 		}
 
-		const Decorator: IAnnotated<IDecoratorAnnotations> = DecoratorFactory(
+		const Decorator: IAnnotated<IDecoratorAnnotation> = DecoratorFactory(
 			DecoratorProcessor.Combine(
 				new ProcessorFn()
 			)
 		);
 
-		@Decorator(decoratorAnnotations)
+		@Decorator(decoratorAnnotation)
 		class DecoratedClass { }
 
 		const decoratedClass = new DecoratedClass();
 
-		expect(decoratedClass[decoratorAnnotations.key]).toBe(decoratorAnnotations.value);
+		expect(decoratedClass[decoratorAnnotation.key]).toBe(decoratorAnnotation.value);
 	});
 
 	it('DecoratorFactory: Usage of RootAccess', () => {
@@ -160,11 +160,11 @@ describe('@solution/core/decorator/factory ClassDecorator Usages', () => {
 	});
 
 	it('DecoratorFactory: Usage of RootAccess with Wrapper', () => {
-		interface IDecoratorAnnotations {
+		interface IDecoratorAnnotation {
 			extra: string;
 		}
 		class RootAccess extends DecoratorProcessor {
-			public do({ targetClass, annotations: { extra } }: IProcessorParams<IDecoratorAnnotations>): Function {
+			public do({ targetClass, annotation: { extra } }: IProcessorParams<IDecoratorAnnotation>): Function {
 				expect(targetClass).toEqual(DecoratedClass);
 				// Wrapping target class
 				// tslint:disable-next-line: only-arrow-functions
@@ -178,7 +178,7 @@ describe('@solution/core/decorator/factory ClassDecorator Usages', () => {
 			}
 		}
 
-		const Decorator: IAnnotated<IDecoratorAnnotations> = DecoratorFactory(
+		const Decorator: IAnnotated<IDecoratorAnnotation> = DecoratorFactory(
 			undefined,
 			DecoratorProcessor.RootAccess(
 				new RootAccess()
