@@ -18,14 +18,12 @@ describe('@solution/core/di', () => {
 	});
 
 	it('is Injection works with Self', () => {
-		@Injection()
 		class RootService {
 			public name: string = 'RootService';
 		}
 
-		@Injection()
 		class SomeService {
-			public name: string = 'SubService';
+			public name: string = 'SomeService';
 		}
 
 		@Injection({
@@ -39,7 +37,7 @@ describe('@solution/core/di', () => {
 				expect(someService instanceof SomeService).toBeTrue();
 			}
 
-			public name: string = 'SomeService';
+			public name: string = 'SubService';
 
 			public runSpecs(): void {
 				expect(this.rootService.name).toBe('SMASHED');
@@ -49,7 +47,7 @@ describe('@solution/core/di', () => {
 
 		@Injection({
 			provideIn: {
-				'SomeService': { scope: InjectionScope.Self }
+				'SubService': { scope: InjectionScope.Self }
 			}
 		})
 		class SomeProvider {
@@ -71,7 +69,7 @@ describe('@solution/core/di', () => {
 				expect(this.subService.name).toBe('SubService');
 
 				this.rootService.name = 'SMASHED';
-				this.subService.name = 'SMASHED';
+				this.someService.name = 'SMASHED';
 
 				this.subService.runSpecs();
 			}
