@@ -1,4 +1,21 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+/.idea
+/.binary
+.pnp.js
+
+# Misc
+.DS_Store
+
+# Bazel
 .bazelrc.user
-dist
-bazel-out
-node_modules
+bazel-*
+/dist*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
