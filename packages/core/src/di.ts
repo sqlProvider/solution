@@ -1,12 +1,7 @@
-export {
-	IInjectionAnnotation,
-	IInjectionProvideConfig,
-	IInjectionProvideIn
-} from '@solution/core/src/di/metadata/annotation';
-export { Injection } from '@solution/core/src/di/metadata/decorator';
-export { RootAccess } from '@solution/core/src/di/metadata/root';
-export { InjectionScope } from '@solution/core/src/di/metadata/scope';
-export { RootInjectionToken } from '@solution/core/src/di/metadata/token';
+export { Injection } from '@solution/core/src/di/metadata/injection/decorator';
+
+export { Scope } from '@solution/core/src/di/metadata/scope/decorator';
+export { InjectionScope } from '@solution/core/src/di/metadata/scope/scope';
 
 export { InjectionProvider } from '@solution/core/src/di/provider';
 export { InjectionToken } from '@solution/core/src/di/token';

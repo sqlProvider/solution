@@ -7,9 +7,9 @@ import { LiteralTemplate } from '@solution/core';
 
 describe('@solution/core/util/literal-template', () => {
 	it('Single use', () => {
-		const template = LiteralTemplate`${0}`;
+		const template = LiteralTemplate`${0}!`;
 
-		expect(template('hello world')).toBe('hello world');
+		expect(template('hello world')).toBe('hello world!');
 	});
 
 	it('With parameter', () => {
@@ -18,7 +18,7 @@ describe('@solution/core/util/literal-template', () => {
 		expect(template('hello world', { foo: '!' })).toBe('hello world !');
 	});
 
-	it('With just variables ', () => {
+	it('With just variables', () => {
 		const template = LiteralTemplate`${'foo'} ${'bar'}`;
 
 		expect(template({ bar: 'world', foo: 'hello' })).toBe('hello world');

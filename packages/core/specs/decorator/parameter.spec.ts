@@ -26,8 +26,8 @@ describe('@solution/core/decorator/factory ParameterDecorator Usages', () => {
 				targetClass[key] = (...args: Array<any>) => {
 					const defaults: IObject<string> = Reflect.getOwnMetadata(DefaultMetadataKey, targetClass, key);
 
-					Object.entries(defaults).forEach(([key, value]) => {
-						const index = parseInt(key);
+					Object.entries(defaults).forEach(([indexKey, value]) => {
+						const index = parseInt(indexKey);
 						if (Type.IsUndefined(args[index])) {
 							args[index] = value;
 						}

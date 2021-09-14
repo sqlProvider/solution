@@ -15,8 +15,7 @@
 		/* Paths */
 		"paths": {
 			"@solution/*": [
-				"./packages/*",
-				"./"
+				"./packages/*"
 			]
 		},
 		/*  */
@@ -59,7 +58,7 @@
 	},
 	"compileOnSave": false,
 	"exclude": [
-		"bazel-*",
+		"*bazel-*",
 		"dist",
 		"node_modules"
 	]

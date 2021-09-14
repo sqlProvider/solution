@@ -1,5 +1,5 @@
 //#region Global Imports
-import { noop, Injection, InjectionScope, Tree } from '@solution/core';
+import { noop, Injection, InjectionScope, Scope, Tree } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
@@ -26,15 +26,20 @@ describe('@solution/core/di', () => {
 			public name: string = 'SomeService';
 		}
 
-		@Injection({
-			provideIn: {
-				'RootService': { scope: InjectionScope.Root }
-			}
-		})
+		class SubSubService {
+			public name: string = 'SubSubService';
+		}
+
+		@Injection()
 		class SubService {
-			constructor(private rootService: RootService, private someService: SomeService) {
+			constructor(
+				@Scope(InjectionScope.Root) private rootService: RootService,
+				@Scope(InjectionScope.Self) private subSubService: SubSubService,
+				private someService: SomeService
+			) {
 				expect(rootService instanceof RootService).toBeTrue();
 				expect(someService instanceof SomeService).toBeTrue();
+				expect(subSubService instanceof SubSubService).toBeTrue();
 			}
 
 			public name: string = 'SubService';
@@ -42,19 +47,16 @@ describe('@solution/core/di', () => {
 			public runSpecs(): void {
 				expect(this.rootService.name).toBe('SMASHED');
 				expect(this.someService.name).toBe('SomeService');
+				expect(this.subSubService.name).toBe('SubSubService');
 			}
 		}
 
-		@Injection({
-			provideIn: {
-				'SubService': { scope: InjectionScope.Self }
-			}
-		})
+		@Injection()
 		class SomeProvider {
 			constructor(
 				private rootService: RootService,
 				private someService: SomeService,
-				private subService: SubService
+				@Scope(InjectionScope.Self) private subService: SubService
 			) {
 				expect(rootService instanceof RootService).toBeTrue();
 				expect(someService instanceof SomeService).toBeTrue();

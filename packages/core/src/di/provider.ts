@@ -2,8 +2,7 @@
 //#endregion Global Imports
 
 //#region Local Imports
-import { IInjectionProvideIn } from '@solution/core/src/di/metadata/annotation';
-import { InjectionScope } from '@solution/core/src/di/metadata/scope';
+import { InjectionScope } from '@solution/core/src/di/metadata/scope/scope';
 import { RootInjectionToken } from '@solution/core/src/di/metadata/token';
 import { InjectionToken } from '@solution/core/src/di/token';
 import { Tree } from '@solution/core/src/di/tree';
@@ -11,29 +10,29 @@ import { Type } from '@solution/core/src/type';
 //#endregion Local Imports
 
 export class InjectionProvider {
+	private static tree: Tree = new Tree();
+
 	public static TryInject<Injection>(
 		parent: any,
 		injection: Injection,
 		injectionTokens: Array<InjectionToken>,
-		provideInConfig: IInjectionProvideIn | undefined
+		scope: InjectionScope,
+		token?: InjectionToken
 	): Injection | null {
 		if (Type.IsFunction(injection)) {
 			const target = this.tree.resolveRealTarget(injection);
-			const parentTarget = this.tree.resolveRealTarget(parent);
-			const name = target.name;
+			const name = target?.name;
 			const isValid = name !== 'Object' && name !== 'Object';
 
 			if (isValid) {
-				const scope = (provideInConfig || {})[name]?.scope;
-				const token = (provideInConfig || {})[name]?.token;
-				const injectionToken = new InjectionToken(target);
-
 				switch (scope) {
 					case InjectionScope.Root:
 						injectionTokens = [RootInjectionToken];
 						break;
 					case InjectionScope.Self:
-						injectionTokens.push(new InjectionToken(parentTarget));
+						injectionTokens.push(
+							this.generateInjectionToken([...injectionTokens], parent, injectionTokens.length)
+						);
 						break;
 
 					default:
@@ -43,6 +42,8 @@ export class InjectionProvider {
 						break;
 				}
 
+				const injectionToken = this.generateInjectionToken([...injectionTokens], injection);
+
 				return this.tree.add<Injection>([...injectionTokens, injectionToken], injection);
 			}
 		}
@@ -50,5 +51,20 @@ export class InjectionProvider {
 		return null;
 	}
 
-	private static tree: Tree = new Tree();
+	private static generateInjectionToken<Injection>(tokens: Array<InjectionToken>, _injection: Injection, from: number = 0): InjectionToken {
+		const keys: Array<string> = [];
+		const injection = this.tree.resolveRealTarget(_injection);
+		tokens.splice(0, from);
+
+		tokens.forEach(token => keys.push(token.token.toString()));
+
+		if (Type.IsFunction(injection) && Type.IsString(injection.name)) {
+			keys.push(injection.name);
+		}
+		else {
+			keys.push(injection as any);
+		}
+
+		return new InjectionToken(`[${keys.join(']->[')}]`);
+	}
 }
