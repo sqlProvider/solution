@@ -8,5 +8,16 @@
 		"**/node_modules": true,
 		"**/bazel-*": true,
 		"**/dist": true
-	}
+	},
+	"files.watcherExclude": {
+		"**/.cache/**": true,
+		"**/bazel-out/**": true,
+		"**/dist/**": true
+	},
+	"search.exclude": {
+		"**/.cache/**": true,
+		"**/bazel-out/**": true,
+		"**/dist/**": true
+	},
+	"js/ts.implicitProjectConfig.experimentalDecorators": true
 }
