@@ -4,16 +4,14 @@
 	"private": true,
 	"devDependencies": {
 		"@bazel/bazelisk": "1.10.1",
-		"@bazel/buildifier": "4.0.1",
-		"@bazel/ibazel": "0.15.10",
-		"@bazel/jasmine": "4.0.0",
-		"@bazel/typescript": "4.0.0",
+		"@bazel/jasmine": "4.1.0",
+		"@bazel/typescript": "4.1.0",
 		"@types/jasmine": "3.9.0",
 		"jasmine": "3.9.0",
 		"jasmine-core": "3.9.0",
 		"jest-cli": "27.1.0",
 		"npm-run-all": "4.1.5",
-		"tslint": "^6.1.3",
+		"tslint": "6.1.3",
 		"typescript": "4.3.5"
 	},
 	"scripts": {
