@@ -6,5 +6,6 @@
 
 export enum InjectionScope {
 	Root,
-	Self
+	Self,
+	Disposable
 }

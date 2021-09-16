@@ -9,7 +9,7 @@ import { DecoratorProcessor, IProcessorParams, Noop, Type } from '@solution/core
 //#endregion Definations
 
 describe('@solution/core/decorator/processor', () => {
-	const processorHubConfig = {
+	const processorHubConfig: IProcessorParams = {
 		annotation: [],
 		descriptor: null,
 		key: '',
@@ -77,8 +77,8 @@ describe('@solution/core/decorator/processor', () => {
 
 		const sun: any = new processedTarget();
 
-		expect(sun instanceof BlackHole).toBeTrue();
-		expect(sun instanceof Sun).toBeFalse();
+		expect(sun).toBeInstanceOf(BlackHole);
+		expect(sun).toBeInstanceOf(Sun);
 	});
 
 	it('Usage of DecoratorProcessor.RootAccess with Wrapper', () => {

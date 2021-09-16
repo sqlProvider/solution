@@ -18,7 +18,7 @@ const SelfInjectionToken = new InjectionToken('__SelfInstance');
 export class Tree {
 	public branches: Branch = new Map();
 
-	public add<Injection>(injectionTokens: Array<InjectionToken>, injection: Injection): Injection | null {
+	public add(injectionTokens: Array<InjectionToken>, injection: any): any | null {
 		if (Type.IsArray(injectionTokens) && injectionTokens.length < 2) { return null; }
 		if (!Type.IsFunction(injection)) { return null; }
 
@@ -51,6 +51,28 @@ export class Tree {
 		return null;
 	}
 
+	public remove(injectionTokens: Array<InjectionToken>): boolean {
+		if (Type.IsArray(injectionTokens)) {
+			const lastToken = injectionTokens.pop();
+			const parent = this.locate(this.branches, injectionTokens);
+
+			if (lastToken instanceof InjectionToken && parent instanceof Map) {
+				const instances = this.resolveAllInstanceInBranch(parent.get(lastToken.token));
+				while (instances.length > 0) {
+					const instance = instances.pop();
+
+					if (Type.IsFunction(instance.dispose)) {
+						instance.dispose();
+					}
+				}
+
+				parent.delete(lastToken.token);
+			}
+		}
+
+		return false;
+	}
+
 	public resolveRealTarget(target: any): any {
 		if (target?.name === 'InjectionRootAccessWrapper') {
 			const possibleConstructor = target.prototype.constructor;
@@ -61,6 +83,21 @@ export class Tree {
 		}
 
 		return target;
+	}
+
+	public resolveAllInstanceInBranch(branch: Branch): Array<any> {
+		const instances: Array<any> = [];
+
+		for (const [_key, value] of branch) {
+			if (value instanceof Map) {
+				instances.push(...this.resolveAllInstanceInBranch(value));
+			}
+			else if (Type.IsFunction(value) || Type.IsObject(value)) {
+				instances.push(value);
+			}
+		}
+
+		return instances;
 	}
 
 	private locate(branch: Branch, tokens: Array<InjectionToken>): Branch | null {

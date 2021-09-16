@@ -27,7 +27,12 @@ export class RootAccess extends DecoratorProcessor {
 			const injectionTokens = isValidChain ? possibleInjectionTokens : [RootInjectionToken];
 
 			injectionList.forEach((injection, index) => {
-				const instance = InjectionProvider.TryInject(targetClass, injection, [...injectionTokens], scopes[index]);
+				const instance = InjectionProvider.TryInject({
+					injection,
+					injectionTokens: [...injectionTokens],
+					parent: targetClass,
+					scope: scopes[index]
+				});
 				customArgs[index] = Type.IsNull(instance) ? args[index] : instance;
 			});
 

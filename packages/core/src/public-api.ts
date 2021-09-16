@@ -1,7 +1,15 @@
 /**
  * @solution/core/decorator
  */
-export * from '@solution/core/src/decorator';
+export {
+	DecoratorFactory,
+	DecoratorProcessor,
+	IAnnotated,
+	IDecorated,
+	IDecoratorProcessorFn,
+	IDecoratorRootAccessFn,
+	IProcessorParams
+} from '@solution/core/src/decorator';
 
 /**
  * @solution/core/di

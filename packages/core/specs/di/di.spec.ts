@@ -1,5 +1,5 @@
 //#region Global Imports
-import { noop, Injection, InjectionScope, Scope, Tree } from '@solution/core';
+import { noop, Injection, InjectionScope, IDisposable, Scope, Tree } from '@solution/core';
 //#endregion Global Imports
 
 //#region Local Imports
@@ -55,25 +55,33 @@ describe('@solution/core/di', () => {
 		class SomeProvider {
 			constructor(
 				private rootService: RootService,
-				private someService: SomeService,
+				@Scope(InjectionScope.Disposable) someService: SomeService,
 				@Scope(InjectionScope.Self) private subService: SubService
 			) {
 				expect(rootService instanceof RootService).toBeTrue();
-				expect(someService instanceof SomeService).toBeTrue();
 				expect(subService instanceof SubService).toBeTrue();
+				expect(someService instanceof Function).toBeTrue();
+
+				this.someService = someService as any;
 
 				this.runSpecs();
 			}
 
+			private someService: IDisposable<SomeService>;
+
 			private runSpecs(): void {
 				expect(this.rootService.name).toBe('RootService');
-				expect(this.someService.name).toBe('SomeService');
+				expect(this.someService().name).toBe('SomeService');
 				expect(this.subService.name).toBe('SubService');
 
 				this.rootService.name = 'SMASHED';
-				this.someService.name = 'SMASHED';
+				this.someService().name = 'SMASHED';
 
 				this.subService.runSpecs();
+
+				this.someService.dispose();
+				this.someService().name = 'SMASHED';
+				this.someService.dispose();
 			}
 		}
 
