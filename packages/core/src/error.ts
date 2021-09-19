@@ -1,3 +1,2 @@
+export { Error } from '@solution/core/src/error/error';
 export { ErrorString } from '@solution/core/src/error/string';
-
-export { WrongInstance } from '@solution/core/src/error/wrong-instance';

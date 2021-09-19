@@ -6,16 +6,16 @@ import { InjectionScope } from '@solution/core/src/di/metadata/scope/scope';
 import { RootInjectionToken } from '@solution/core/src/di/metadata/token';
 import { InjectionToken } from '@solution/core/src/di/token';
 import { Tree } from '@solution/core/src/di/tree';
+import { Error, ErrorString } from '@solution/core/src/error';
 import { Type } from '@solution/core/src/type';
 //#endregion Local Imports
 
 //#region Definations
 interface ITryInjectConfig {
-	parent: any;
 	injection: any;
 	injectionTokens: Array<InjectionToken>;
-	scope: InjectionScope;
-	token?: InjectionToken;
+	scope?: InjectionScope;
+	parent?: any;
 }
 //#endregion Definations
 
@@ -23,83 +23,122 @@ export class InjectionProvider {
 	private static tree: Tree = new Tree();
 	private static disposableIndex: number = 0;
 
-	public static TryInject(config: ITryInjectConfig): any | null {
-		const { injection, parent, scope, token } = config;
+	public static TryInject(config: ITryInjectConfig = {} as ITryInjectConfig): any | null {
+		const { injection, parent, scope } = config;
 		let { injectionTokens } = config;
 
-		if (Type.IsFunction(injection)) {
-			const target = this.tree.resolveRealTarget(injection);
-			const name = target?.name;
-			const isValid = name !== 'Object' && name !== 'Object';
+		if (!Type.IsFunction(injection)) {
+			return this.error({ ...config, reason: ErrorString.InstanceConfigInjection });
+		}
+		if (!Type.IsArray(injectionTokens)) {
+			return this.error({ ...config, reason: ErrorString.InstanceConfigInjectionTokens });
+		}
+		else {
+			const isValidChain = injectionTokens.every(injectionToken => injectionToken instanceof InjectionToken);
 
-			if (isValid) {
-				switch (scope) {
-					case InjectionScope.Root:
-						injectionTokens = [RootInjectionToken];
-						break;
-					case InjectionScope.Self:
-						injectionTokens.push(
-							this.generateInjectionToken([...injectionTokens], parent, injectionTokens.length)
-						);
-						break;
-
-					case InjectionScope.Disposable:
-						return this.dispoableWrapper(config);
-
-					default:
-						if (token instanceof InjectionToken) {
-							injectionTokens = [token];
-						}
-						break;
-				}
-
-				const injectionToken = this.generateInjectionToken([...injectionTokens], injection);
-
-				return this.tree.add([...injectionTokens, injectionToken], injection);
+			if (!isValidChain) {
+				return this.error({ ...config, reason: ErrorString.InstanceConfigInjectionTokensNotValid });
 			}
 		}
 
-		return null;
+		const target = this.resolveRealTarget(injection);
+		const name = target?.name;
+		const isValid = name !== 'Object';
+
+		if (isValid) {
+			switch (scope) {
+				case InjectionScope.Root:
+					injectionTokens = [RootInjectionToken];
+
+					break;
+
+				case InjectionScope.Self:
+					if (Type.IsFunction(parent) || Type.IsObject(parent)) {
+						injectionTokens.push(
+							this.generateInjectionToken([], parent)
+						);
+
+						break;
+					}
+
+					return this.error({ ...config, reason: ErrorString.InstanceConfigScopeSelf });
+
+				case InjectionScope.Disposable:
+					return this.disposableWrapper(config);
+
+				default:
+					break;
+			}
+
+			if (injectionTokens.length === 0) {
+				return this.error({ ...config, reason: ErrorString.InstanceConfigZeroToken });
+			}
+
+			const injectionToken = this.generateInjectionToken([...injectionTokens], injection);
+
+			return this.tree.add([...injectionTokens, injectionToken], injection);
+		}
+
+		return this.error({ ...config, reason: ErrorString.InstanceConfigNotValid });
 	}
 
-	private static generateInjectionToken<Injection>(tokens: Array<InjectionToken>, _injection: Injection, from: number = 0): InjectionToken {
+	public static resolveRealTarget(target: any): any {
+		if (Type.IsFunction(target) && target.name === 'InjectionRootAccessWrapper') {
+			const possibleConstructor = target.prototype.constructor;
+
+			if (!Type.IsUndefined(possibleConstructor)) {
+				return target.prototype.constructor;
+			}
+		}
+
+		return target;
+	}
+
+	private static generateInjectionToken(tokens: Array<InjectionToken>, _injection: any): InjectionToken {
 		const keys: Array<string> = [];
-		const injection = this.tree.resolveRealTarget(_injection);
-		tokens.splice(0, from);
+		const injection = this.resolveRealTarget(_injection);
 
 		tokens.forEach(token => keys.push(token.token.toString()));
-
-		if (Type.IsFunction(injection) && Type.IsString(injection.name)) {
-			keys.push(injection.name);
-		}
-		else {
-			keys.push(injection as any);
-		}
+		keys.push(injection.name);
 
 		return new InjectionToken(`[${keys.join(']->[')}]`);
 	}
 
-	private static dispoableWrapper(config: ITryInjectConfig): any {
+	private static disposableWrapper(config: ITryInjectConfig): any {
 		const { injection, injectionTokens, parent } = config;
+		let selfInjection: any;
 
 		// Parent Injection Token
-		injectionTokens.push(this.generateInjectionToken([...injectionTokens], parent, injectionTokens.length));
+		if (Type.IsFunction(parent)) {
+			injectionTokens.push(this.generateInjectionToken([], parent));
+		}
 
-		const selfToken = this.generateInjectionToken([...injectionTokens], injection, injectionTokens.length);
+		const selfToken = this.generateInjectionToken([], injection);
 		const injectionToken = this.generateInjectionToken([...injectionTokens], injection);
-		const tokens = [...injectionTokens, selfToken, injectionToken];
+		const tokens = [...injectionTokens, selfToken];
 
-		injectionToken.token = injectionToken.token.replace(/\]$/, `-${++this.disposableIndex}]`);
+		this.increaseDispoableIndex(injectionToken);
 
-		const DisposableWrapper = () => this.tree.add([...tokens], injection);
+		const DisposableWrapper = () => selfInjection || (selfInjection = this.tree.add([...tokens, injectionToken], injection));
+
 		DisposableWrapper.dispose = () => {
-			const result = this.tree.remove([...tokens]);
+			const oldInjection = selfInjection;
+			selfInjection = undefined;
 
-			injectionToken.token = injectionToken.token.replace(/(\]|-\d\])$/, `-${++this.disposableIndex}]`);
+			this.tree.remove([...tokens]);
+			this.increaseDispoableIndex(injectionToken);
 
-			return result;
+			return oldInjection;
 		};
 
 		return DisposableWrapper;
+	}
+
+	private static increaseDispoableIndex(injectionToken: InjectionToken): any {
+		injectionToken.token = injectionToken.token.replace(/(\]|-\d\])$/, `-${++this.disposableIndex}]`);
+	}
+
+	private static error(config: any): null {
+		throw new Error({ ...config, from: 'InjectionProvider -> TryInject'}, ErrorString.InstanceConfig);
 	}
 }

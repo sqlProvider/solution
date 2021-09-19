@@ -78,7 +78,7 @@ describe('@solution/core/decorator/processor', () => {
 		const sun: any = new processedTarget();
 
 		expect(sun).toBeInstanceOf(BlackHole);
-		expect(sun).toBeInstanceOf(Sun);
+		expect(sun instanceof Sun).toBeFalse();
 	});
 
 	it('Usage of DecoratorProcessor.RootAccess with Wrapper', () => {

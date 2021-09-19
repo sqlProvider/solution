@@ -22,12 +22,18 @@ describe('@solution/core/di', () => {
 			public name: string = 'RootService';
 		}
 
-		class SomeService {
-			public name: string = 'SomeService';
-		}
-
 		class SubSubService {
 			public name: string = 'SubSubService';
+		}
+
+		@Injection()
+		class SomeService {
+			constructor(
+				subSubService: SubSubService
+			) {
+				expect(subSubService instanceof SubSubService).toBeTrue();
+			}
+			public name: string = 'SomeService';
 		}
 
 		@Injection()

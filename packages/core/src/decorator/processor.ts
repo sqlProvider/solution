@@ -2,11 +2,10 @@
 //#endregion Global Imports
 
 //#region Local Imports
-import { WrongInstance } from '@solution/core/src/error';
+import { Error, ErrorString } from '@solution/core/src/error';
 //#endregion Local Imports
 
 //#region Definations
-const ErrorString = 'DecoratorProcessor';
 //#endregion Definations
 
 /**
@@ -40,7 +39,7 @@ export abstract class DecoratorProcessor {
 					return processor.do(params);
 				}
 
-				throw new WrongInstance(ErrorString, ErrorString);
+				this.error();
 			});
 		};
 	}
@@ -51,9 +50,13 @@ export abstract class DecoratorProcessor {
 				return processor.do(params) || params.targetClass;
 			}
 
-			throw new WrongInstance(ErrorString, ErrorString);
+			this.error();
 		};
 	}
 
 	public abstract do(params: IProcessorParams): any;
+
+	private static error(): void {
+		throw new Error({ from: 'DecoratorProcessor' }, ErrorString.DecoratorProcessorInstance);
+	}
 }

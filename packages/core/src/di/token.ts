@@ -6,7 +6,7 @@
 
 /**
  * @class InjectionToken
- * I will change token logic but this is better now :)
+ * I will change token logic but this is better for now :)
  */
 export class InjectionToken {
 	constructor(public token: string) {}
